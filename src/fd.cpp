@@ -43,7 +43,7 @@ FileDescriptor::operator bool() const noexcept {
 
 std::expected<void, std::string> FileDescriptor::set_nonblocking() {
     if (fd_ < 0) {
-        return std::unexpected(std::string{"invalid file descriptor"});
+        return std::unexpected(std::string{"Invalid file descriptor"});
     }
 
     const int flags = fcntl(fd_, F_GETFL, 0);
