@@ -43,14 +43,17 @@ void assert_bytes_eq(const std::vector<std::byte>& actual, const char* expected)
 }
 
 const std::string& as_string(const redix::RespValue& value) {
+    cr_assert(std::holds_alternative<std::string>(value.value));
     return std::get<std::string>(value.value);
 }
 
 std::int64_t as_integer(const redix::RespValue& value) {
+    cr_assert(std::holds_alternative<std::int64_t>(value.value));
     return std::get<std::int64_t>(value.value);
 }
 
 const redix::RespValue::Array& as_array(const redix::RespValue& value) {
+    cr_assert(std::holds_alternative<redix::RespValue::Array>(value.value));
     return std::get<redix::RespValue::Array>(value.value);
 }
 
