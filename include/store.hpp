@@ -118,6 +118,8 @@ public:
     std::shared_lock<std::shared_mutex> lock_shared() const;
 
 private:
+    static bool is_expired(const Entry& entry) noexcept;
+
     mutable std::shared_mutex mutex_;
     std::flat_map<std::string, Entry> data_;
 };

@@ -1,5 +1,10 @@
+ifeq ($(origin CXX),default)
 CXX := clang++
+endif
+
+ifeq ($(origin CC),default)
 CC := clang
+endif
 
 BIN_DIR := bin
 BUILD_DIR := build
