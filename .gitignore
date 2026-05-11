@@ -1,0 +1,29 @@
+# macOS
+.DS_Store
+
+# VSCode
+.vscode/
+
+# Build output
+build/
+
+# Binaries
+*.o
+*.out
+*.a
+*.so
+*.dylib
+*.exe
+
+# Dependency files
+*.d
+
+# Debugging
+*.dSYM/
+
+# Redis persistence
+*.rdb
+*.aof
+
+# Temp
+*.log
