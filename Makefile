@@ -1,10 +1,5 @@
-ifeq ($(origin CXX),default)
-CXX := clang++
-endif
-
-ifeq ($(origin CC),default)
-CC := clang
-endif
+CXX ?= clang++
+CC ?= clang
 
 BIN_DIR := bin
 BUILD_DIR := build
