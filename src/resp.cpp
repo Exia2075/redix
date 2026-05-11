@@ -4,6 +4,7 @@
 #include <charconv>
 #include <cstddef>
 #include <cstdint>
+#include <span> 
 #include <string>
 #include <string_view>
 #include <system_error>
@@ -36,6 +37,7 @@ std::size_t find_crlf(const std::vector<std::byte>& buf, std::size_t pos) {
     return std::string::npos;
 }
 
+/* Helper to read a line. */
 std::string read_string(const std::vector<std::byte>& buf, std::size_t start, std::size_t end) {
     std::string out;
     out.reserve(end - start);
@@ -45,11 +47,9 @@ std::string read_string(const std::vector<std::byte>& buf, std::size_t start, st
     return out;
 }
 
+/* Helper to parse integer from substring. */
 bool parse_i64(std::string_view s, std::int64_t& out) {
-    if (s.empty()) {
-        return false;
-    }
-
+    if (s.empty()) return false;
     const char* first = s.data();
     const char* last = s.data() + s.size();
     const auto [ptr, ec] = std::from_chars(first, last, out);
@@ -65,7 +65,7 @@ ParseResult parse_at(const std::vector<std::byte>& buf, std::size_t pos) {
     const std::size_t payload_start = pos + 1;
 
     switch (type) {
-    case '+': {
+    case '+': { // Simple String
         const std::size_t line_end = find_crlf(buf, payload_start);
         if (line_end == std::string::npos) {
             return {ParseStatus::Incomplete, {}, 0};
@@ -74,7 +74,7 @@ ParseResult parse_at(const std::vector<std::byte>& buf, std::size_t pos) {
                 RespValue{read_string(buf, payload_start, line_end)},
                 line_end + CRLF.size() - pos};
     }
-    case '-': {
+    case '-': { // Error
         const std::size_t line_end = find_crlf(buf, payload_start);
         if (line_end == std::string::npos) {
             return {ParseStatus::Incomplete, {}, 0};
@@ -83,7 +83,7 @@ ParseResult parse_at(const std::vector<std::byte>& buf, std::size_t pos) {
                 RespValue{RespError{read_string(buf, payload_start, line_end)}},
                 line_end + CRLF.size() - pos};
     }
-    case ':': {
+    case ':': { // Integer
         const std::size_t line_end = find_crlf(buf, payload_start);
         if (line_end == std::string::npos) {
             return {ParseStatus::Incomplete, {}, 0};
@@ -96,7 +96,7 @@ ParseResult parse_at(const std::vector<std::byte>& buf, std::size_t pos) {
         }
         return {ParseStatus::Complete, RespValue{n}, line_end + CRLF.size() - pos};
     }
-    case '$': {
+    case '$': { // Bulk String
         const std::size_t line_end = find_crlf(buf, payload_start);
         if (line_end == std::string::npos) {
             return {ParseStatus::Incomplete, {}, 0};
@@ -125,7 +125,7 @@ ParseResult parse_at(const std::vector<std::byte>& buf, std::size_t pos) {
                 RespValue{read_string(buf, data_start, data_end)},
                 data_end + CRLF.size() - pos};
     }
-    case '*': {
+    case '*': { // Array
         const std::size_t line_end = find_crlf(buf, payload_start);
         if (line_end == std::string::npos) {
             return {ParseStatus::Incomplete, {}, 0};
